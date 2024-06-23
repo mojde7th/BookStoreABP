@@ -251,15 +251,15 @@ paket-files/
 .idea/
 *.sln.iml
 
-# BookStore
-src/Acme.BookStore.Web/Logs/*
-src/Acme.BookStore.Web.Host/Logs/*
-src/Acme.BookStore.AuthServer/Logs/*
-src/Acme.BookStore.HttpApi.Host/Logs/*
-src/Acme.BookStore.HttpApi.HostWithIds/Logs/*
-src/Acme.BookStore.DbMigrator/Logs/*
-src/Acme.BookStore.Blazor.Server/Logs/*
-src/Acme.BookStore.Blazor.Server.Tiered/Logs/*
+# TodoApp
+src/TodoApp.Web/Logs/*
+src/TodoApp.Web.Host/Logs/*
+src/TodoApp.AuthServer/Logs/*
+src/TodoApp.HttpApi.Host/Logs/*
+src/TodoApp.HttpApi.HostWithIds/Logs/*
+src/TodoApp.DbMigrator/Logs/*
+src/TodoApp.Blazor.Server/Logs/*
+src/TodoApp.Blazor.Server.Tiered/Logs/*
 
 # Use abp install-libs to restore.
 **/wwwroot/libs/*

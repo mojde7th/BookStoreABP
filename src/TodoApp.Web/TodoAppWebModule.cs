@@ -65,7 +65,7 @@ public class TodoAppWebModule : AbpModule
     {
         var hostingEnvironment = context.Services.GetHostingEnvironment();
         var configuration = context.Services.GetConfiguration();
-        context.Services.AddAutoMapper(typeof(BookMappingProfile));
+        //context.Services.AddAutoMapper(typeof(BookMappingProfile));
         context.Services.PreConfigure<AbpMvcDataAnnotationsLocalizationOptions>(options =>
         {
             options.AddAssemblyResource(
@@ -191,8 +191,17 @@ public class TodoAppWebModule : AbpModule
     {
         services.AddControllers();
         services.AddLogging();
-        services.AddAutoMapper(typeof(BookMappingProfile)); // Ensure AutoMapper is registered
-    
+        //services.AddAutoMapper(typeof(BookMappingProfile)); // Ensure AutoMapper is registered
+        services.AddCors(options =>
+        {
+            options.AddPolicy("AllowAll",
+                builder =>
+                {
+                    builder.AllowAnyOrigin()
+                           .AllowAnyMethod()
+                           .AllowAnyHeader();
+                });
+        });
         services.AddAbpSwaggerGen(
             options =>
             {
@@ -223,6 +232,7 @@ public class TodoAppWebModule : AbpModule
         app.UseCorrelationId();
         app.UseStaticFiles();
         app.UseRouting();
+        app.UseCors("AllowAll");
         app.UseSerilogRequestLogging(); 
        app.UseAuthentication();
         app.UseAbpOpenIddictValidation();

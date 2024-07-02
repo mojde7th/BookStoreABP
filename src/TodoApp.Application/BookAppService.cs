@@ -9,23 +9,30 @@ using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
 using TodoApp.Application.Contracts;
+using Microsoft.Extensions.Logging;
 
 namespace TodoApp.Application
 {
-    public class BookAppService : CrudAppService<Book, BookDto, Guid, PagedAndSortedResultRequestDto, CreateBookDto, UpdateBookDto>, 
+    public class BookAppService : CrudAppService<Book, BookDto, Guid,
+        PagedAndSortedResultRequestDto, CreateBookDto, UpdateBookDto>, 
         IBookAppService
     {
         private readonly IMapper _mapper;
-
-        public BookAppService(IRepository<Book, Guid> repository, IMapper mapper)
+        private readonly ILogger<BookAppService> _logger;
+        public BookAppService(IRepository<Book, Guid> repository,
+            IMapper mapper, ILogger<BookAppService> logger)
             : base(repository)
         {
             _mapper = mapper;
+            _logger = logger;
         }
 
-        protected override IQueryable<Book> ApplySorting(IQueryable<Book> query, PagedAndSortedResultRequestDto input)
+        protected override IQueryable<Book> ApplySorting
+            (IQueryable<Book> query, 
+            PagedAndSortedResultRequestDto input)
         {
-            if (string.IsNullOrEmpty(input.Sorting) || input.Sorting == "Name")
+            if (string.IsNullOrEmpty(input.Sorting) || 
+                input.Sorting == "Name")
             {
                 return query.OrderBy(b => b.Name);
             }
@@ -33,66 +40,61 @@ namespace TodoApp.Application
             return query.OrderBy(b => b.Name); // Default sorting
         }
 
-        public override async Task<BookDto> CreateAsync(CreateBookDto input)
+        public override async Task<BookDto> CreateAsync
+            (CreateBookDto input)
         {
             try
             {
-                Console.WriteLine("Input received: " + input.ToString());
+                _logger.LogInformation("Input received: {Input}", input);
 
-                Console.WriteLine("Mapping CreateBookDto to Book...");
+                _logger.LogInformation
+                    ("Mapping CreateBookDto to Book...");
                 var book = _mapper.Map<Book>(input);
-                Console.WriteLine("Mapped successfully: " + book.ToString());
+                _logger.LogInformation("Mapped successfully: {Book}",
+                    book);
 
                 var createdBook = await Repository.InsertAsync(book);
                 await CurrentUnitOfWork.SaveChangesAsync();
 
-                Console.WriteLine("Mapping Book to BookDto...");
+                _logger.LogInformation("Mapping Book to BookDto...");
                 var bookDto = _mapper.Map<BookDto>(createdBook);
-                Console.WriteLine("Mapped successfully: " + bookDto.ToString());
+                _logger.LogInformation("Mapped successfully: {BookDto}", bookDto);
 
                 return bookDto;
+
+              
             }
             catch (Exception ex)
             {
-                // Log detailed exception information
-                Console.WriteLine($"Exception: {ex.Message}");
-                if (ex.InnerException != null)
-                {
-                    Console.WriteLine($"Inner Exception: {ex.InnerException.Message}");
-                }
-                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+                _logger.LogError(ex, "Error creating book");
                 throw;
             }
         }
 
-        public override async Task<BookDto> UpdateAsync(Guid id, UpdateBookDto input)
+        public override async Task<BookDto> UpdateAsync
+            (Guid id, UpdateBookDto input)
         {
             try
             {
                 var book = await Repository.GetAsync(id);
 
-                Console.WriteLine("Mapping UpdateBookDto to Book...");
+                _logger.LogInformation("Mojde Mapping UpdateBookDto to Book...");
                 _mapper.Map(input, book);
-                Console.WriteLine("Mapped successfully.");
+                _logger.LogInformation("Mojde Mapped successfully.");
 
                 await Repository.UpdateAsync(book);
                 await CurrentUnitOfWork.SaveChangesAsync();
 
-                Console.WriteLine("Mapping Book to BookDto...");
+                _logger.LogInformation("Mojde Mapping Book to BookDto...");
                 var bookDto = _mapper.Map<BookDto>(book);
-                Console.WriteLine("Mapped successfully: " + bookDto.ToString());
+                _logger.LogInformation("Mojde Mapped successfully: {BookDto}",
+                    bookDto);
 
                 return bookDto;
             }
             catch (Exception ex)
             {
-                // Log detailed exception information
-                Console.WriteLine($"Exception: {ex.Message}");
-                if (ex.InnerException != null)
-                {
-                    Console.WriteLine($"Inner Exception: {ex.InnerException.Message}");
-                }
-                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+                _logger.LogError(ex, "Error updating book");
                 throw;
             }
         }
@@ -102,17 +104,11 @@ namespace TodoApp.Application
             try
             {
                 await Repository.DeleteAsync(id);
-                await CurrentUnitOfWork.SaveChangesAsync();
+                //await CurrentUnitOfWork.SaveChangesAsync();
             }
             catch (Exception ex)
             {
-                // Log detailed exception information
-                Console.WriteLine($"Exception: {ex.Message}");
-                if (ex.InnerException != null)
-                {
-                    Console.WriteLine($"Inner Exception: {ex.InnerException.Message}");
-                }
-                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+                _logger.LogError(ex, "Error deleting book");
                 throw;
             }
         }

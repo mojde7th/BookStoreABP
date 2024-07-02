@@ -32,6 +32,8 @@ const BookList = () => {
   return (
     <div>
       <h1>Books</h1>
+      <Link to={`/publishers`}>Back to publishers Page</Link>
+      <br/>
       <Link to="/books/new">Add Book</Link>
       <ul>
         {books.map(book => (

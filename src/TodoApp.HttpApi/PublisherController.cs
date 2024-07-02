@@ -19,9 +19,11 @@ namespace TodoApp.HttpApi
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<PublisherDto>>> GetPublishersWithBooksAsync()
+        public async Task<ActionResult<List<PublisherDto>>> 
+            GetPublishersWithBooksAsync()
         {
-            var publishers = await _publisherAppService.GetPublishersWithBooksAsync();
+            var publishers = await _publisherAppService.
+                GetPublishersWithBooksAsync();
             return Ok(publishers);
         }
 

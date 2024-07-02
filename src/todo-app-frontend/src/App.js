@@ -17,7 +17,7 @@ function App() {
           <Route path="/books/edit/:id" element={<EditBookForm />} />
           <Route path="/publishers" element={< PublisherForm/>} />
           <Route path="/publishers/new" element={<PublisherList />} />
-          <Route path="/publishers/edit/:id" element={<EditPublisherForm />} />
+          <Route path="/publishers/edit/:id" element={<PublisherList />} />
         </Routes>
       </div>
     </Router>

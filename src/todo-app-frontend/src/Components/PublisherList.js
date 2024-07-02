@@ -21,6 +21,8 @@ const PublisherList = () => {
     <div>
       <h1>Publishers</h1>
       <Link to="/publishers/new">Add Publisher</Link>
+      <br/>
+      <Link to={`/books`}>Back to Book List</Link>
       <ul>
         {publishers.map(publisher => (
           <li key={publisher.id}>

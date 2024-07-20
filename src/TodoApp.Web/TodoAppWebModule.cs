@@ -43,7 +43,10 @@ using AutoMapper;
 using TodoApp;
 using Autofac.Core;
 using Serilog;
-
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Volo.Abp.Account;
+using AccountAppService = TodoApp.Application.AccountAppService;
 namespace TodoApp.Web;
 
 [DependsOn(
@@ -61,7 +64,8 @@ namespace TodoApp.Web;
     )]
 public class TodoAppWebModule : AbpModule
 {
-    public override void PreConfigureServices(ServiceConfigurationContext context)
+    public override void PreConfigureServices
+        (ServiceConfigurationContext context)
     {
         var hostingEnvironment = context.Services.GetHostingEnvironment();
         var configuration = context.Services.GetConfiguration();
@@ -102,11 +106,26 @@ public class TodoAppWebModule : AbpModule
         }
     }
 
-    public override void ConfigureServices(ServiceConfigurationContext context)
+    public override void ConfigureServices
+        (ServiceConfigurationContext context)
     {
-        var hostingEnvironment = context.Services.GetHostingEnvironment();
+        var hostingEnvironment = context.Services.
+            GetHostingEnvironment();
         var configuration = context.Services.GetConfiguration();
-
+        context.Services.AddTransient<
+            IAccountAppService, AccountAppService>();
+        context.Services.AddIdentityCore
+            <IdentityUser>(options => { });
+        context.Services.AddScoped<SignInManager<IdentityUser>,
+            SignInManager<IdentityUser>>();
+        context.Services.AddDbContext<TodoAppDbContext>(options =>
+        options.UseSqlServer(configuration.
+        GetConnectionString("Default")));
+        Configure<AbpAspNetCoreMvcOptions>(options => {
+            options.ConventionalControllers.Create
+                (typeof(TodoAppApplicationModule)
+                .Assembly);
+        });
         ConfigureAuthentication(context);
         ConfigureUrls(configuration);
         ConfigureBundles();
@@ -232,6 +251,8 @@ public class TodoAppWebModule : AbpModule
         app.UseCorrelationId();
         app.UseStaticFiles();
         app.UseRouting();
+        app.UseAuthentication();
+        app.UseAuthorization();
         app.UseCors("AllowAll");
         app.UseSerilogRequestLogging(); 
        app.UseAuthentication();
@@ -244,7 +265,7 @@ public class TodoAppWebModule : AbpModule
 
         app.UseUnitOfWork();
         app.UseDynamicClaims();
-        app.UseAuthorization();
+     
 
         app.UseSwagger();
         app.UseAbpSwaggerUI(options =>

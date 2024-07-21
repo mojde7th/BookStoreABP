@@ -82,7 +82,7 @@ options.DefaultAuthenticateScheme=JwtBearerDefaults.
                 );
             builder.Services.AddAuthorization(options =>
             {
-                options.AddPolicy("reguirelogin", policy =>
+                options.AddPolicy("RequireLoggedIn", policy =>
                 policy.RequireAuthenticatedUser());
             }
             );
